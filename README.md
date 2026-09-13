@@ -3,8 +3,6 @@
 
 MEVShield analyzes blockchain transactions in real time, extracts behavioral features inside Exasol, scores transaction risk with XGBoost, and surfaces suspicious MEV activity through a live investigation dashboard.
 
-[![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
-
 ---
 
 ## 1. Elevator Pitch & Visual Proof
@@ -13,7 +11,7 @@ MEVShield analyzes blockchain transactions in real time, extracts behavioral fea
 
 🎥 **[Watch 3-Minute Demo Video (YouTube)](https://youtu.be/your-demo-id)** | 📁 **[Alternative Demo Video Link (Google Drive)](https://drive.google.com/file/d/your-drive-id/view)**
 
-![MEVShield Live Dashboard Overview](assets/dashboard_overview.png)
+![MEVShield Live Dashboard Overview](assets/dashboard_overview.png?v=2)
 
 ![MEVShield Incident Forensics & Block Context Analytics](assets/incident_forensics.png)
 
