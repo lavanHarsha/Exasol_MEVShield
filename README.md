@@ -88,57 +88,7 @@ python3 judge_quick_eval.py
 
 ## 4. System Architecture
 
-```
-                                    ┌──────────────────────────────────────────────┐
-                                    │          ETHEREUM ON-CHAIN MEMPOOL           │
-                                    │    (Dune Analytics: 3.4M DEX Transactions)   │
-                                    └──────────────────────┬───────────────────────┘
-                                                           │
-                                                           ▼
-                             ┌───────────────────────────────────────────────────────────┐
-                             │               EXASOL IN-MEMORY DATABASE                   │
-                             │                  (Docker Container :8563)                 │
-                             ├───────────────────────────────────────────────────────────┤
-                             │ • MEV_SHIELD.RAW_SANDWICH_DATA (3.4M records)             │
-                             │ • MEV_SHIELD.PREPROCESSED_SANDWICH_DATA (Cleaned)         │
-                             │ • MEV_SHIELD.SANDWICH_FEATURES (Log Scaling & Bounds)     │
-                             │ • Strict Chronological Block Splitting:                   │
-                             │    ├── SANDWICH_TRAIN (2,444,471 rows - 72%)              │
-                             │    ├── SANDWICH_TEST  (  611,106 rows - 18%)              │
-                             │    └── SANDWICH_LIVE_DEMO (339,501 rows - 10%)            │
-                             │ • MEV_SHIELD.SANDWICH_PREDICTIONS (Writeback results)     │
-                             └─────────────┬───────────────────────────────▲─────────────┘
-                                           │                               │
-                      pyexasol             │ Fast Chunked                  │ 3.23s Bulk
-                      Connection           │ In-Memory Read                │ Parallel Write
-                                           ▼                               │
-                             ┌───────────────────────────────┐             │
-                             │   PYTHON ORCHESTRATION LAYER  │             │
-                             │     (.venv / CUDA Enabled)    │             │
-                             ├───────────────────────────────┤             │
-                             │ • 01_clean_preprocess.py      │             │
-                             │ • 02_eda.py                   │             │
-                             │ • 03_feature_engineering.py   │             │
-                             │ • 04_train_evaluate.py        ├─────────────┘
-                             └─────────────┬─────────────────┘
-                                           │
-                        ┌──────────────────┴──────────────────┐
-                        ▼                                     ▼
-      ┌─────────────────────────────────┐   ┌───────────────────────────────────┐
-      │      GPU-ACCELERATED ML CORE    │   │         SERIALIZED ARTIFACTS      │
-      ├─────────────────────────────────┤   ├───────────────────────────────────┤
-      │ • XGBoost (CUDA 13.1 GPU Engine)│   │ • models/champion_mev_model.joblib│
-      │ • LightGBM (Histogram Engine)   │   │ • data/live_demo_holdout.csv      │
-      │ • CatBoost (Symmetric Trees GPU)│   │ • MODEL_BENCHMARK_REPORT.md       │
-      │ • PR-AUC & Cost-Sensitive Loss  │   │ • END_TO_END_TECHNICAL_REPORT.md  │
-      └─────────────────────────────────┘   └─────────────────┬─────────────────┘
-                                                              │
-                                                              ▼
-                                            ┌───────────────────────────────────┐
-                                            │      LIVE FRONTEND / DASHBOARD    │
-                                            │  (Real-Time MEV Attack Shield)    │
-                                            └───────────────────────────────────┘
-```
+![MEVShield System Architecture](assets/architecture.jpg)
 
 ### End-to-End Detection Pipeline
 
@@ -257,6 +207,7 @@ MEVShield_Exasol/
 │   ├── judge_quick_eval.py             # 5-second rapid CLI verification benchmark script
 │   └── tests/COMMANDS.md               # Exasol in-database SQL audit verification commands
 ├── assets/                             # Visual proof & dashboard architecture screenshots
+│   ├── architecture.jpg                # End-to-end Exasol + XGBoost system architecture diagram
 │   ├── dashboard_overview.png          # Primary dashboard overview & real-time monitoring preview
 │   └── incident_forensics.png          # Deep transaction forensics & block context analytics preview
 ├── run_dashboard.bat                   # 1-Click launcher for Windows (backend + frontend + browser)
