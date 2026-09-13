@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { getStatus } from '../api/api';
 
 const Header = () => {
   const [apiConnected, setApiConnected] = useState(false);
   const [modelLoaded, setModelLoaded] = useState(false);
-  // We don't have a direct Exasol check, so we'll assume it's connected if API is connected
   const [exasolConnected, setExasolConnected] = useState(false);
 
   useEffect(() => {
@@ -14,8 +12,8 @@ const Header = () => {
         if (response.ok) {
           const data = await response.json();
           setApiConnected(true);
-          setModelLoaded(data.model_loaded);
-          setExasolConnected(true); // Assuming Exasol is connected if API is up
+          setModelLoaded(Boolean(data.model_loaded));
+          setExasolConnected(true);
         } else {
           setApiConnected(false);
           setModelLoaded(false);
@@ -29,24 +27,41 @@ const Header = () => {
     };
 
     checkConnection();
-    const interval = setInterval(checkConnection, 5000);
+    const interval = setInterval(checkConnection, 4000);
     return () => clearInterval(interval);
   }, []);
 
   return (
     <header className="header">
-      <div className="header-content">
-        <h1>MEV SHIELD</h1>
-        <p>Real-Time MEV Attack Detection</p>
-        <div className="indicators">
-          <div className={`indicator ${apiConnected ? 'connected' : 'disconnected'}`}>
-            ● API Connected
+      <div className="header-container">
+        <div className="header-brand">
+          <div className="brand-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              <path d="m9 12 2 2 4-4" />
+            </svg>
           </div>
-          <div className={`indicator ${exasolConnected ? 'connected' : 'disconnected'}`}>
-            ● Exasol Connected
+          <div>
+            <div className="brand-title-row">
+              <span className="brand-title">EXASOL MEVSHIELD</span>
+              <span className="brand-tag">IN-MEMORY ML DEFENSE</span>
+            </div>
+            <p className="brand-subtitle">Real-Time Sandwich Attack Detection & Exploitation Mitigation</p>
           </div>
-          <div className={`indicator ${modelLoaded ? 'connected' : 'disconnected'}`}>
-            ● Model Loaded
+        </div>
+
+        <div className="header-indicators">
+          <div className={`status-pill ${apiConnected ? 'online' : 'offline'}`}>
+            <span className="status-dot"></span>
+            <span className="status-label">API Gateway</span>
+          </div>
+          <div className={`status-pill ${exasolConnected ? 'online' : 'offline'}`}>
+            <span className="status-dot"></span>
+            <span className="status-label">Exasol Engine</span>
+          </div>
+          <div className={`status-pill ${modelLoaded ? 'online' : 'offline'}`}>
+            <span className="status-dot"></span>
+            <span className="status-label">XGBoost Core</span>
           </div>
         </div>
       </div>
