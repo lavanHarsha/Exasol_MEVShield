@@ -171,9 +171,6 @@ typings/
 .rts2_cache _tsdoc/
 ._tslib.cache
 
-# Built files
-*.css
-
 # Environment variables
 .env
 .env.development

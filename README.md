@@ -30,8 +30,8 @@ MEVShield eliminates this exploitation by turning Exasol's ultra-fast in-memory 
 ### Option A: 1-Click Automated Launch (Recommended)
 
 ```bash
-# Windows:
-run_dashboard.bat
+# Windows (PowerShell / CMD):
+.\run_dashboard.bat
 
 # macOS / Linux:
 chmod +x run_dashboard.sh
@@ -76,8 +76,8 @@ npm run dev
 ### Option C: 5-Second Rapid ML Benchmark Evaluation (Headless CLI)
 
 ```bash
-# Windows:
-run_judge_eval.bat
+# Windows (PowerShell / CMD):
+.\run_judge_eval.bat
 
 # macOS / Linux:
 cd Exasol_MEVShield-main
