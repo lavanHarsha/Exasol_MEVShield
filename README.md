@@ -17,9 +17,9 @@ MEVShield analyzes blockchain transactions in real time, extracts behavioral fea
 
 🎥 **[Watch 3-Minute Demo Video (YouTube)](https://youtu.be/your-demo-id)** | 📁 **[Alternative Demo Video Link (Google Drive)](https://drive.google.com/file/d/your-drive-id/view)**
 
-![MEVShield Live Dashboard Overview](1st_image.png)
+![MEVShield Live Dashboard Overview](assets/dashboard_overview.png)
 
-![MEVShield Incident Forensics & Block Context Analytics](2nd_image.png)
+![MEVShield Incident Forensics & Block Context Analytics](assets/incident_forensics.png)
 
 ---
 
@@ -335,8 +335,9 @@ MEVShield_Exasol/
 │   ├── data/live_demo_holdout.csv      # Chronologically unseen holdout stream (339,501 rows)
 │   ├── judge_quick_eval.py             # 5-second rapid CLI verification benchmark script
 │   └── tests/COMMANDS.md               # Exasol in-database SQL audit verification commands
-├── 1st_image.png                       # Primary dashboard overview & real-time monitoring preview
-├── 2nd_image.png                       # Deep transaction forensics & block context analytics preview
+├── assets/                             # Visual proof & dashboard architecture screenshots
+│   ├── dashboard_overview.png          # Primary dashboard overview & real-time monitoring preview
+│   └── incident_forensics.png          # Deep transaction forensics & block context analytics preview
 ├── run_dashboard.bat                   # 1-Click launcher for Windows (backend + frontend + browser)
 ├── run_dashboard.sh                   # 1-Click launcher for macOS & Linux (backend + frontend + browser)
 ├── run_judge_eval.bat                  # 1-Click rapid ML evaluation script for Windows
