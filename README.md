@@ -3,10 +3,6 @@
 
 MEVShield analyzes blockchain transactions in real time, extracts behavioral features inside Exasol, scores transaction risk with XGBoost, and surfaces suspicious MEV activity through a live investigation dashboard.
 
-[![Exasol](https://img.shields.io/badge/Exasol-In--Memory%20Analytics-blue?style=for-the-badge&logo=database)](https://www.exasol.com/)
-[![Champion Model](https://img.shields.io/badge/Champion%20Model-XGBoost%20GPU-green?style=for-the-badge)](https://xgboost.readthedocs.io/)
-[![PR-AUC](https://img.shields.io/badge/PR--AUC-0.8591-brightgreen?style=for-the-badge)](#6-machine-learning--data-science)
-[![Precision](https://img.shields.io/badge/Precision-90.09%25-success?style=for-the-badge)](#6-machine-learning--data-science)
 [![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
 
 ---
@@ -33,57 +29,55 @@ MEVShield eliminates this exploitation by turning Exasol's ultra-fast in-memory 
 
 ## 3. ⚡ Quick Start
 
-```bash
-# ==============================================================================
-# OPTION A: 1-CLICK AUTOMATED LAUNCH (BACKEND + FRONTEND + AUTO BROWSER OPEN)
-# ==============================================================================
+### Option A: 1-Click Automated Launch (Recommended)
 
-# Windows (Command Prompt or PowerShell):
+```bash
+# Windows:
 run_dashboard.bat
 
-# macOS / Linux (Terminal):
+# macOS / Linux:
 chmod +x run_dashboard.sh
 ./run_dashboard.sh
 ```
 
-```bash
-# ==============================================================================
-# OPTION B: MANUAL STEP-BY-STEP SETUP & EXECUTION
-# ==============================================================================
+### Option B: Manual Step-by-Step Setup & Execution
 
-# Step 1: Install Backend Python Dependencies
+#### Step 1: Install backend Python dependencies
+```bash
 # Windows:
 pip install -r backend/requirements.txt
+
 # macOS / Linux:
 pip3 install -r backend/requirements.txt
+```
 
-# Step 2: Install Frontend Dependencies (Windows / macOS / Linux):
+#### Step 2: Install frontend dependencies
+```bash
 cd frontend
 npm install
 cd ..
+```
 
-# Step 3: Launch Backend FastAPI Server (Terminal 1)
+#### Step 3: Launch backend FastAPI server (Terminal 1)
+```bash
 # Windows:
 cd backend
 python main.py
+
 # macOS / Linux:
 cd backend
 python3 main.py
-# Server running at: http://localhost:8000
-# API Health Check: http://localhost:8000/api/health
-
-# Step 4: Launch Frontend React Vite Dashboard (Terminal 2)
-# Windows / macOS / Linux:
-cd frontend
-npm run dev
-# Dashboard running live at: http://localhost:5173
 ```
 
+#### Step 4: Launch frontend React Vite dashboard (Terminal 2)
 ```bash
-# ==============================================================================
-# OPTION C: 5-SECOND RAPID ML BENCHMARK EVALUATION (HEADLESS CLI FOR JUDGES)
-# ==============================================================================
+cd frontend
+npm run dev
+```
 
+### Option C: 5-Second Rapid ML Benchmark Evaluation (Headless CLI)
+
+```bash
 # Windows:
 run_judge_eval.bat
 
@@ -171,77 +165,6 @@ Exasol's in-memory columnar database powers the core of MEVShield. By executing 
 - ⏱️ **In-Memory SQL Exploratory Data Analysis**: Analyzed **136,088 Ethereum blocks in 10.90 seconds** using native Exasol SQL.
 - 🔄 **Bidirectional In-Memory Writeback**: **611,106 batch predictions written back into Exasol in 3.23 seconds** via parallel chunked loading (~189,000 rows/sec).
 - 🚀 **Sub-12ms Analytical Query Latency**: Real-time pool volume aggregations and gas spike analytics return in milliseconds under live stream conditions.
-
-### In-Database SQL Audit Queries (For Database Evaluators)
-
-Evaluators can connect to Exasol via **EXAplus**, **DBeaver**, or any JDBC/ODBC client (`localhost:8563`, user `sys`, schema `MEV_SHIELD`) to audit table states and execution outputs:
-
-#### 1. Verify Table Ingestion & Row Counts
-```sql
-OPEN SCHEMA MEV_SHIELD;
-
-SELECT 'RAW_SANDWICH_DATA' AS TABLE_NAME, COUNT(*) AS ROW_COUNT FROM RAW_SANDWICH_DATA
-UNION ALL
-SELECT 'PREPROCESSED_SANDWICH_DATA', COUNT(*) FROM PREPROCESSED_SANDWICH_DATA
-UNION ALL
-SELECT 'SANDWICH_FEATURES', COUNT(*) FROM SANDWICH_FEATURES
-UNION ALL
-SELECT 'SANDWICH_TRAIN', COUNT(*) FROM SANDWICH_TRAIN
-UNION ALL
-SELECT 'SANDWICH_TEST', COUNT(*) FROM SANDWICH_TEST
-UNION ALL
-SELECT 'SANDWICH_LIVE_DEMO', COUNT(*) FROM SANDWICH_LIVE_DEMO
-UNION ALL
-SELECT 'SANDWICH_PREDICTIONS', COUNT(*) FROM SANDWICH_PREDICTIONS;
-```
-*Expected Counts: `PREPROCESSED_SANDWICH_DATA`: 3,395,078 | `SANDWICH_TRAIN`: 2,444,471 (72%) | `SANDWICH_TEST`: 611,106 (18%) | `SANDWICH_LIVE_DEMO`: 339,501 (10%) | `SANDWICH_PREDICTIONS`: 611,106 (100% test set scored).*
-
-#### 2. Verify Zero Data Leakage Across Chronological Splits
-```sql
-SELECT 
-    'TRAIN' AS SPLIT, MIN(BLOCK_NUMBER) AS MIN_BLOCK, MAX(BLOCK_NUMBER) AS MAX_BLOCK 
-FROM SANDWICH_TRAIN
-UNION ALL
-SELECT 
-    'TEST' AS SPLIT, MIN(BLOCK_NUMBER) AS MIN_BLOCK, MAX(BLOCK_NUMBER) AS MAX_BLOCK 
-FROM SANDWICH_TEST
-UNION ALL
-SELECT 
-    'LIVE_DEMO' AS SPLIT, MIN(BLOCK_NUMBER) AS MIN_BLOCK, MAX(BLOCK_NUMBER) AS MAX_BLOCK 
-FROM SANDWICH_LIVE_DEMO
-ORDER BY MIN_BLOCK;
-```
-*Verification: The maximum block of Train (`17,999,999`) is strictly lower than the minimum block of Test (`18,000,000`), and Test's maximum is strictly lower than Live Demo's minimum.*
-
-#### 3. Verify Champion Model Predictions Written to Exasol
-```sql
-SELECT 
-    PREDICTED_LABEL,
-    COUNT(*) AS TOTAL_PREDICTED,
-    ROUND(AVG(PREDICTION_PROBABILITY), 4) AS AVG_PROBABILITY,
-    ROUND(MIN(PREDICTION_PROBABILITY), 4) AS MIN_PROBABILITY,
-    ROUND(MAX(PREDICTION_PROBABILITY), 4) AS MAX_PROBABILITY
-FROM MEV_SHIELD.SANDWICH_PREDICTIONS
-GROUP BY PREDICTED_LABEL;
-```
-
-#### 4. Inspect High-Risk Sandwich Attack Detections
-```sql
-SELECT 
-    P.TX_HASH,
-    P.BLOCK_NUMBER,
-    P.PREDICTION_PROBABILITY,
-    F.LOG_AMOUNT_USD,
-    F.LOG_GAS_PRICE,
-    F.PREVIOUS_GAP,
-    F.NEXT_GAP,
-    F.LABEL AS GROUND_TRUTH
-FROM MEV_SHIELD.SANDWICH_PREDICTIONS P
-JOIN MEV_SHIELD.SANDWICH_FEATURES F ON P.TX_HASH = F.TX_HASH
-WHERE P.PREDICTED_LABEL = 1
-ORDER BY P.PREDICTION_PROBABILITY DESC
-LIMIT 10;
-```
 
 ### Architectural Highlights
 
